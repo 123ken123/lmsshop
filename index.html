@@ -43,26 +43,37 @@
     </div>
 
     <script>
-        // Danh sách các Key hợp lệ (Khớp với dữ liệu Bot tạo ra)
-        const validKeys = [
-            "CLAN-VA9H-A08G",
-"CLAN-QUZX-FV2H"
-        ];
-
-        // Đoạn code script LMS360 đã được làm rối (Obfuscated) bảo mật
+        // Đường dẫn tới file keys.json trên kho GitHub của bạn
+const keysJsonUrl = "https://raw.githubusercontent.com/123ken123/lmsshop/main/keys.json";
+        
+        // Đoạn code script LMS360 đã được làm rối (Obfuscated) bảo mật của bạn
         const obfuscatedScript = `/* DÁN ĐOẠN CODE ĐÃ MÃ HÓA TỪ OBFUSCATOR.IO VÀO ĐÂY */`;
 
-        function checkKey() {
-            let key = document.getElementById('userKey').value.trim();
+        async function checkKey() {
+            let userKey = document.getElementById('userKey').value.trim();
             let output = document.getElementById('output');
             let scriptArea = document.getElementById('scriptCode');
 
-            if (validKeys.includes(key)) {
-                scriptArea.value = obfuscatedScript;
-                output.style.display = 'block';
-            } else {
-                alert("❌ Key không chính xác hoặc đã bị vô hiệu hóa!");
-                output.style.display = 'none';
+            if (!userKey) {
+                alert("❌ Vui lòng nhập mã key!");
+                return;
+            }
+
+            try {
+                // Tải trực tiếp file keys.json từ GitHub để đối chiếu key theo thời gian thực
+                let response = await fetch(keysJsonUrl + "?t=" + new Date().getTime());
+                let keysData = await response.json();
+
+                if (keysData[userKey] && keysData[userKey].status === "active") {
+                    scriptArea.value = obfuscatedScript;
+                    output.style.display = 'block';
+                } else {
+                    alert("❌ Key không chính xác, đã hết hạn hoặc đã bị vô hiệu hóa!");
+                    output.style.display = 'none';
+                }
+            } catch (error) {
+                console.error("Lỗi kết nối:", error);
+                alert("❌ Không thể kết nối tới hệ thống xác thực. Vui lòng thử lại!");
             }
         }
 
