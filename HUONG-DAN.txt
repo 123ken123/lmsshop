@@ -1,0 +1,18 @@
+CAU TRUC THU MUC (phai dung nhu vay):
+  shop\
+    server.js
+    products.json
+    start.bat
+    them-key.ps1
+    public\
+      index.html     <- file giao dien (da doi ten tu index_1.html)
+
+CHAY:
+  1. Mo start.bat bang Notepad, doi WEBHOOK_KEY va ADMIN_TOKEN, luu lai.
+  2. Double-click start.bat. Thay "Shop chay tai http://localhost:3000" la OK.
+  3. Mo trinh duyet: http://localhost:3000
+  4. Them key vao kho (neu khong san pham se hien HET HANG):
+       .\them-key.ps1 -ProductId 1 -Keys "KEY1","KEY2" -Token "token-admin-cua-ban"
+     ProductId 1-4 theo products.json.
+  5. Khi len mang: dat WEBHOOK_KEY trong SePay giong trong start.bat,
+     URL webhook: https://ten-mien/api/webhook/sepay

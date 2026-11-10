@@ -1,0 +1,6 @@
+[
+{"id":1,"type":"script","ico":"🚀","cls":"t1","name":"Script LMS360 (7 ngày)","price":30000,"days":7,"feats":["Tự động quét & điền đáp án","Chạy trực tiếp qua F12 Console","Cập nhật đáp án mới liên tục","Hỗ trợ 1 thiết bị/acc"]},
+{"id":2,"type":"script","ico":"⚡","cls":"t2","name":"Script LMS360 (30 ngày)","price":90000,"days":30,"pop":true,"feats":["Toàn bộ tính năng gói 7 ngày","Cập nhật đáp án liên tục","Hỗ trợ 1 thiết bị/acc","Ưu tiên hỗ trợ"]},
+{"id":3,"type":"tool","ico":"🖥️","cls":"t3","name":"Tool .EXE (30 ngày)","price":150000,"days":30,"feats":["Ứng dụng chạy độc lập","Giao diện dễ dùng","Tự động cập nhật","Hỗ trợ 1 thiết bị"]},
+{"id":4,"type":"tool","ico":"👑","cls":"t4","name":"Tool .EXE (Vĩnh viễn)","price":350000,"days":0,"feats":["Dùng vĩnh viễn","Cập nhật trọn đời","Hỗ trợ 2 thiết bị","Hỗ trợ ưu tiên"]}
+]
