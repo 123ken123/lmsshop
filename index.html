@@ -1,88 +1,952 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LMS360 VIP Gateway - Clan</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .card { background: #1e293b; width: 100%; max-width: 450px; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; text-align: center; }
-        .badge { background: #3b82f6; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-        h2 { margin: 15px 0 5px; font-size: 24px; font-weight: 700; color: #fff; }
-        p.subtitle { color: #94a3b8; font-size: 14px; margin-bottom: 25px; }
-        .input-group { margin-bottom: 20px; text-align: left; }
-        label { display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 8px; font-weight: 600; }
-        input { width: 100%; padding: 14px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #38bdf8; font-size: 16px; font-weight: bold; text-align: center; outline: none; transition: 0.3s; }
-        input:focus { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
-        button { width: 100%; background: #2563eb; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #1d4ed8; }
-        #output { margin-top: 20px; text-align: left; display: none; }
-        textarea { width: 100%; height: 110px; background: #0f172a; color: #4ade80; border: 1px solid #334155; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 12px; resize: none; margin-top: 8px; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Shop LMS360</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+/* ── Tokens ───────────────────────────────────────────────── */
+:root {
+  --bg:        #0b0d14;
+  --bg2:       #121520;
+  --bg3:       #1a1f30;
+  --border:    #252a3d;
+  --border-hi: #4a3fa0;
+  --purple:    #6c5ce7;
+  --purple-hi: #a29bfe;
+  --purple-dim:#3d3473;
+  --green:     #00b894;
+  --red:       #d63031;
+  --amber:     #fdcb6e;
+  --text:      #e8eaf6;
+  --text-dim:  #8892b0;
+  --text-muted:#4a5068;
+  --radius:    10px;
+  --radius-sm: 6px;
+  --mono:      'JetBrains Mono', monospace;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) { :root { color-scheme: dark; } }
+*, *::before, *::after { box-sizing: inherit; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--bg); color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; }
+a { color: var(--purple-hi); text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+input  { font-family: inherit; }
+
+/* ── Particle canvas ──────────────────────────────────────── */
+#bg-canvas {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none; opacity: .45;
+}
+
+/* ── Layout ───────────────────────────────────────────────── */
+.app { display: flex; flex-direction: column; min-height: 100%; position: relative; z-index: 1; }
+
+header {
+  position: sticky; top: env(safe-area-inset-top, 0px);
+  background: rgba(11,13,20,.88); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; height: 56px; z-index: 100;
+  animation: slideDown .4s cubic-bezier(.22,1,.36,1) both;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px); z-index: 101;
+  background: rgba(11,13,20,.88); backdrop-filter: blur(16px);
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+.logo { font-size: .95rem; font-weight: 700; color: var(--text);
+  display: flex; align-items: center; gap: 8px; }
+.logo span { color: var(--purple-hi); }
+.logo-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 7px;
+  background: linear-gradient(135deg, var(--purple), var(--purple-hi));
+  font-size: 1rem;
+  animation: logoPulse 3s ease-in-out infinite;
+}
+@keyframes logoPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(108,92,231,.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(108,92,231,0); }
+}
+
+.header-right { display: flex; gap: 10px; align-items: center; }
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn { display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px; border: none; border-radius: var(--radius-sm);
+  padding: 8px 16px; font-size: .875rem; font-weight: 600;
+  transition: opacity .15s, background .15s, transform .15s, box-shadow .15s;
+  white-space: nowrap; }
+.btn:hover  { opacity: .9; transform: translateY(-1px); }
+.btn:active { transform: translateY(0) scale(.97); }
+.btn-primary  { background: var(--purple); color: #fff;
+  box-shadow: 0 2px 12px rgba(108,92,231,.35); }
+.btn-primary:hover { box-shadow: 0 4px 20px rgba(108,92,231,.55); opacity: 1; }
+.btn-ghost    { background: transparent; color: var(--text-dim);
+  border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--bg3); color: var(--text); opacity: 1; }
+.btn-sm { padding: 6px 12px; font-size: .82rem; }
+.btn-green  { background: var(--green); color: #fff;
+  box-shadow: 0 2px 12px rgba(0,184,148,.3); }
+.btn-green:hover { box-shadow: 0 4px 20px rgba(0,184,148,.5); opacity: 1; }
+.btn-danger { background: var(--red); color: #fff; }
+
+/* ── Ripple ───────────────────────────────────────────────── */
+.btn { position: relative; overflow: hidden; }
+.ripple {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,255,255,.25);
+  transform: scale(0); animation: rippleAnim .5s linear;
+  pointer-events: none;
+}
+@keyframes rippleAnim {
+  to { transform: scale(4); opacity: 0; }
+}
+
+main { flex: 1; padding: 32px 24px; max-width: 960px; margin: 0 auto; width: 100%; }
+
+/* ── Auth panel ───────────────────────────────────────────── */
+.auth-wrap { display: flex; justify-content: center; padding-top: 48px; }
+.auth-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 32px 28px;
+  width: min(380px, 100%);
+  animation: fadeUp .45s cubic-bezier(.22,1,.36,1) both;
+}
+.auth-card h2 { font-size: 1.1rem; margin-bottom: 20px; color: var(--text); }
+.auth-tabs { display: flex; gap: 0; margin-bottom: 24px;
+  border-bottom: 1px solid var(--border); }
+.auth-tab { background: none; border: none; color: var(--text-dim);
+  padding: 8px 16px; font-size: .88rem; font-weight: 600;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .2s, border-color .2s; }
+.auth-tab.active { color: var(--purple-hi); border-bottom-color: var(--purple); }
+
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: .8rem; color: var(--text-dim);
+  margin-bottom: 5px; font-weight: 500; }
+.form-group input {
+  width: 100%; padding: 9px 12px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-size: .9rem;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+}
+.form-group input:focus {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(108,92,231,.2);
+}
+.form-err { color: var(--red); font-size: .8rem; margin-top: 8px; min-height: 18px; }
+
+/* ── Shop ─────────────────────────────────────────────────── */
+.shop-header { display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+.shop-header h1 { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.balance-pill {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 20px; padding: 6px 14px;
+  font-size: .85rem; color: var(--text-dim);
+  transition: border-color .2s;
+}
+.balance-pill:hover { border-color: var(--border-hi); }
+.balance-pill strong { color: var(--purple-hi); font-family: var(--mono); }
+
+.products { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px; margin-bottom: 32px; }
+
+/* ── Product card ─────────────────────────────────────────── */
+.product-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+  display: flex; flex-direction: column; gap: 12px;
+  transition: border-color .25s, transform .25s, box-shadow .25s;
+  position: relative; overflow: hidden;
+  opacity: 0; /* starts hidden, JS triggers fade-in */
+}
+.product-card.visible {
+  animation: cardEntrance .5s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes cardEntrance {
+  from { opacity: 0; transform: translateY(16px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.product-card:hover {
+  border-color: var(--border-hi);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(108,92,231,.2), 0 2px 8px rgba(0,0,0,.4);
+}
+.product-card.out-of-stock { opacity: .55; }
+.product-card.out-of-stock:hover { transform: none; box-shadow: none; }
+
+/* glow sweep on hover */
+.product-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(108,92,231,.08) 0%, transparent 60%);
+  opacity: 0; transition: opacity .3s;
+  pointer-events: none;
+}
+.product-card:hover::before { opacity: 1; }
+
+/* shimmer line */
+.product-card::after {
+  content: '';
+  position: absolute; top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.04), transparent);
+  transition: left .55s ease;
+  pointer-events: none;
+}
+.product-card:hover::after { left: 160%; }
+
+.card-badge {
+  position: absolute; top: 10px; right: 10px;
+  font-size: .7rem; font-weight: 700; padding: 3px 8px;
+  border-radius: 4px; text-transform: uppercase; letter-spacing: .04em;
+}
+.badge-popular { background: var(--purple); color: #fff; }
+.badge-out     { background: var(--red); color: #fff; }
+
+.card-ico  { font-size: 2.2rem; transition: transform .2s; }
+.product-card:hover .card-ico { transform: scale(1.15) rotate(-3deg); }
+
+.card-name { font-size: .95rem; font-weight: 700; color: var(--text); }
+.card-price {
+  font-family: var(--mono); font-size: 1.15rem;
+  font-weight: 600; color: var(--purple-hi);
+  position: relative; display: inline-block;
+}
+/* price shimmer */
+.card-price::after {
+  content: attr(data-price);
+  position: absolute; left: 0; top: 0;
+  background: linear-gradient(90deg, var(--purple-hi), #fff, var(--purple-hi));
+  background-size: 200%;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  opacity: 0; transition: opacity .2s;
+}
+.product-card:hover .card-price::after { opacity: 1; animation: priceShimmer 1.2s linear infinite; }
+@keyframes priceShimmer {
+  from { background-position: 200% center; }
+  to   { background-position: -200% center; }
+}
+
+.card-feats { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.card-feats li { font-size: .8rem; color: var(--text-dim); }
+.card-feats li::before { content: '✓ '; color: var(--green); }
+.card-footer { margin-top: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.card-sold { font-size: .75rem; color: var(--text-muted); align-self: center; }
+
+/* ── History / Orders ─────────────────────────────────────── */
+.section-title { font-size: .95rem; font-weight: 700; margin-bottom: 14px;
+  color: var(--text); padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.history-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 28px; }
+.history-item {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 14px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: .85rem;
+  transition: border-color .2s, background .2s;
+  animation: fadeUp .3s ease both;
+}
+.history-item:hover { border-color: var(--border-hi); background: var(--bg3); }
+.history-item .h-desc { color: var(--text-dim); }
+.history-item .h-amt  { font-family: var(--mono); font-weight: 600; }
+.history-item .h-amt.pos { color: var(--green); }
+.history-item .h-amt.neg { color: var(--red); }
+.history-item .h-time { font-size: .75rem; color: var(--text-muted); }
+
+.order-item {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: .85rem; margin-bottom: 6px;
+  transition: border-color .2s, background .2s;
+  animation: fadeUp .3s ease both;
+}
+.order-item:hover { border-color: var(--border-hi); background: var(--bg3); }
+.order-id    { font-family: var(--mono); color: var(--purple-hi); font-size: .8rem; }
+.order-name  { color: var(--text); font-weight: 600; }
+.order-time  { color: var(--text-muted); font-size: .75rem; }
+.key-box {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 4px; padding: 6px 10px;
+  font-family: var(--mono); font-size: .82rem; color: var(--amber);
+  word-break: break-all; margin-top: 4px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.key-box:hover { border-color: var(--amber); box-shadow: 0 0 0 2px rgba(253,203,110,.15); }
+
+/* ── QR Section ───────────────────────────────────────────── */
+.qr-section {
+  background: var(--bg2); border: 1px solid var(--border-hi);
+  border-radius: var(--radius); padding: 24px;
+  text-align: center; margin-bottom: 24px;
+  animation: fadeUp .4s cubic-bezier(.22,1,.36,1) both;
+  position: relative; overflow: hidden;
+}
+/* rotating border glow */
+.qr-section::before {
+  content: '';
+  position: absolute; inset: -2px;
+  background: conic-gradient(from 0deg, transparent 60%, var(--purple) 100%);
+  border-radius: calc(var(--radius) + 2px);
+  animation: borderSpin 3s linear infinite;
+  z-index: -1;
+}
+@keyframes borderSpin {
+  to { transform: rotate(360deg); }
+}
+.qr-section img {
+  max-width: 200px; border-radius: 8px; margin: 12px 0;
+  transition: transform .3s;
+}
+.qr-section img:hover { transform: scale(1.04); }
+.qr-memo { font-family: var(--mono); font-size: 1rem; font-weight: 600;
+  color: var(--amber); letter-spacing: .05em; }
+.qr-amount { font-size: 1.3rem; font-weight: 700; color: var(--purple-hi);
+  font-family: var(--mono); margin-bottom: 4px; }
+.qr-info { font-size: .82rem; color: var(--text-dim); margin-top: 6px; }
+.qr-status { font-size: .9rem; margin-top: 12px; }
+.qr-status.pending {
+  color: var(--amber);
+  animation: pendingPulse 1.5s ease-in-out infinite;
+}
+@keyframes pendingPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .45; }
+}
+.qr-status.paid    { color: var(--green); animation: successPop .4s cubic-bezier(.22,1,.36,1) both; }
+@keyframes successPop {
+  from { transform: scale(.8); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ── Modal ────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0);
+  display: none; align-items: center; justify-content: center;
+  z-index: 999; padding: 16px;
+  transition: background .25s;
+}
+.modal-overlay.open { display: flex; background: rgba(0,0,0,.7); }
+.modal-box {
+  background: var(--bg2); border: 1px solid var(--border-hi);
+  border-radius: var(--radius); padding: 28px 24px;
+  width: min(440px, 100%); position: relative;
+  transform: scale(.93) translateY(12px);
+  opacity: 0;
+  transition: transform .3s cubic-bezier(.22,1,.36,1), opacity .3s;
+}
+.modal-overlay.open .modal-box {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+.modal-box h3 { font-size: 1rem; font-weight: 700; margin-bottom: 18px; }
+.modal-close {
+  position: absolute; top: 12px; right: 14px;
+  background: none; border: none; color: var(--text-muted);
+  font-size: 1.3rem; cursor: pointer; line-height: 1; padding: 2px 6px;
+  transition: color .15s, transform .15s;
+}
+.modal-close:hover { color: var(--text); transform: rotate(90deg); }
+
+.preset-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  margin-bottom: 14px;
+}
+.preset-btn {
+  background: var(--bg3); border: 2px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text-dim);
+  padding: 10px 6px; font-size: .88rem; font-weight: 600;
+  transition: border-color .15s, color .15s, background .15s, transform .15s;
+  font-family: var(--mono);
+}
+.preset-btn:hover { border-color: var(--border-hi); color: var(--text); transform: translateY(-1px); }
+.preset-btn.active { border-color: var(--purple); background: var(--purple-dim); color: var(--purple-hi); }
+
+.custom-row { margin-bottom: 16px; }
+.custom-row label { font-size: .8rem; color: var(--text-dim); display: block; margin-bottom: 5px; }
+.custom-row input {
+  width: 100%; padding: 9px 12px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-size: .9rem;
+  font-family: var(--mono); outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.custom-row input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(108,92,231,.2); }
+.modal-note { font-size: .78rem; color: var(--text-muted); text-align: center; margin-top: 10px; }
+
+/* ── Toast ────────────────────────────────────────────────── */
+#toast {
+  position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 20px;
+  font-size: .875rem; color: var(--text); z-index: 9999;
+  opacity: 0; transition: opacity .25s, transform .25s;
+  pointer-events: none; white-space: nowrap;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toast.ok  { border-color: var(--green); color: var(--green);
+  box-shadow: 0 4px 20px rgba(0,184,148,.2); }
+#toast.err { border-color: var(--red);   color: var(--red);
+  box-shadow: 0 4px 20px rgba(214,48,49,.2); }
+
+/* ── Shared entrance ──────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Page-load stagger for main content ───────────────────── */
+.shop-header { animation: fadeUp .4s .1s ease both; }
+.section-title { animation: fadeUp .3s ease both; }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  header { padding: 0 14px; }
+  main   { padding: 20px 14px; }
+  .products { grid-template-columns: 1fr 1fr; }
+  .preset-grid { grid-template-columns: repeat(3, 1fr); }
+  .shop-header { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 400px) {
+  .products { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+  #bg-canvas { display: none; }
+}
+
+/* ── Skeleton loader ──────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.4s infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes skeletonShimmer {
+  from { background-position: 200% center; }
+  to   { background-position: -200% center; }
+}
+
+/* ── Số dư counter animation ──────────────────────────────── */
+@keyframes countUp {
+  from { opacity: .4; transform: translateY(4px); }
+  to   { opacity: 1;  transform: translateY(0); }
+}
+.balance-animate { animation: countUp .4s ease both; }
+</style>
 </head>
 <body>
+<canvas id="bg-canvas"></canvas>
+<div class="app">
 
-    <div class="card">
-        <span class="badge">Clan LMS360 Tool</span>
-        <h2>Xác Thực Key Bản Quyền</h2>
-        <p class="subtitle">Nhập mã Key do Bot Discord cấp để nhận Script</p>
-
-        <div class="input-group">
-            <label>MÃ KEY BẢN QUYỀN:</label>
-            <input type="text" id="userKey" placeholder="CLAN-XXXX-XXXX" autocomplete="off">
-        </div>
-
-        <button onclick="checkKey()">KÍCH HOẠT SCRIPT</button>
-
-        <div id="output">
-            <label style="color:#4ade80;">✅ XÁC THỰC THÀNH CÔNG! ĐOẠN SCRIPT CỦA BẠN:</label>
-            <textarea id="scriptCode" readonly></textarea>
-            <button style="background: #10b981; margin-top: 10px;" onclick="copyScript()">📋 Copy Mã Script</button>
-        </div>
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <span class="logo-icon">🎓</span>
+      Shop <span>LMS360</span>
     </div>
+    <div class="header-right" id="header-right">
+      <button class="btn btn-ghost btn-sm" onclick="showAuth('login')">Đăng nhập</button>
+      <button class="btn btn-primary btn-sm" onclick="showAuth('register')">Đăng ký</button>
+    </div>
+  </header>
 
-    <script>
-        // Đường dẫn tới file keys.json trên kho GitHub của bạn
-const keysJsonUrl = "https://raw.githubusercontent.com/123ken123/lmsshop/main/keys.json";
-        
-        // Đoạn code script LMS360 đã được làm rối (Obfuscated) bảo mật của bạn
-        const obfuscatedScript = `/* DÁN ĐOẠN CODE ĐÃ MÃ HÓA TỪ OBFUSCATOR.IO VÀO ĐÂY */`;
+  <main id="main"></main>
+</div>
 
-        async function checkKey() {
-            let userKey = document.getElementById('userKey').value.trim();
-            let output = document.getElementById('output');
-            let scriptArea = document.getElementById('scriptCode');
+<!-- Modal nạp tiền -->
+<div class="modal-overlay" id="topup-modal" onclick="onModalOverlayClick(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeTopupModal()">✕</button>
+    <h3>Nạp tiền vào tài khoản</h3>
+    <div class="preset-grid" id="preset-grid"></div>
+    <div class="custom-row">
+      <label>Hoặc nhập số tiền khác</label>
+      <input id="custom-amount" type="number" min="10000" step="1000"
+             placeholder="VD: 75000" oninput="onCustomInput()" />
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:11px"
+            onclick="confirmTopup()">Xác nhận nạp tiền</button>
+    <p class="modal-note">Số tiền sẽ cộng vào số dư sau khi thanh toán thành công</p>
+  </div>
+</div>
 
-            if (!userKey) {
-                alert("❌ Vui lòng nhập mã key!");
-                return;
-            }
+<!-- Toast -->
+<div id="toast"></div>
 
-            try {
-                // Tải trực tiếp file keys.json từ GitHub để đối chiếu key theo thời gian thực
-                let response = await fetch(keysJsonUrl + "?t=" + new Date().getTime());
-                let keysData = await response.json();
+<script>
+'use strict';
 
-                if (keysData[userKey] && keysData[userKey].status === "active") {
-                    scriptArea.value = obfuscatedScript;
-                    output.style.display = 'block';
-                } else {
-                    alert("❌ Key không chính xác, đã hết hạn hoặc đã bị vô hiệu hóa!");
-                    output.style.display = 'none';
-                }
-            } catch (error) {
-                console.error("Lỗi kết nối:", error);
-                alert("❌ Không thể kết nối tới hệ thống xác thực. Vui lòng thử lại!");
-            }
+/* ── Particle background ────────────────────────────────────── */
+(function initParticles() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx    = canvas.getContext('2d');
+  const COUNT  = 55;
+  let W, H, particles;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function mkParticle() {
+    return {
+      x:  Math.random() * W,
+      y:  Math.random() * H,
+      r:  .6 + Math.random() * 1.6,
+      vx: (Math.random() - .5) * .3,
+      vy: (Math.random() - .5) * .3,
+      a:  Math.random(),
+    };
+  }
+
+  function init() {
+    resize();
+    particles = Array.from({ length: COUNT }, mkParticle);
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // connections
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d  = Math.sqrt(dx * dx + dy * dy);
+        if (d < 120) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(108,92,231,${(.15 * (1 - d / 120)).toFixed(3)})`;
+          ctx.lineWidth = .6;
+          ctx.stroke();
         }
+      }
+    }
+    // dots
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(162,155,254,${p.a.toFixed(2)})`;
+      ctx.fill();
+    });
+  }
 
-        function copyScript() {
-            let code = document.getElementById('scriptCode');
-            code.select();
-            document.execCommand("copy");
-            alert("📋 Đã sao chép mã script! Mở F12 Console trên LMS360 và dán vào để chạy.");
-        }
-    </script>
+  function step() {
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      p.a += (Math.random() - .5) * .01;
+      p.a  = Math.max(.1, Math.min(.8, p.a));
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+    });
+    draw();
+    requestAnimationFrame(step);
+  }
+
+  window.addEventListener('resize', resize);
+  init();
+  step();
+})();
+
+/* ── Ripple on all .btn ─────────────────────────────────────── */
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.btn');
+  if (!btn) return;
+  const r   = document.createElement('span');
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  r.className = 'ripple';
+  r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+  btn.appendChild(r);
+  r.addEventListener('animationend', () => r.remove());
+});
+
+/* ── State ──────────────────────────────────────────────────── */
+let TOKEN    = localStorage.getItem('token') || '';
+let ME       = null;
+let PRODUCTS = [];
+let _selectedPreset = 0;
+let _pollIv  = null;
+let _currentQrMemo = null;
+
+const PRESETS = [10000, 20000, 30000, 50000, 90000, 100000, 150000, 200000, 350000];
+
+/* ── Utils ──────────────────────────────────────────────────── */
+const fmt     = n => Number(n).toLocaleString('vi-VN') + '₫';
+const fmtDate = ts => new Date(ts).toLocaleString('vi-VN', { hour12: false });
+const $       = id => document.getElementById(id);
+
+let _toastTid;
+function toast(msg, type = '') {
+  const el = $('toast');
+  el.textContent = msg;
+  el.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(_toastTid);
+  _toastTid = setTimeout(() => { el.className = ''; }, 3200);
+}
+
+async function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  if (TOKEN) headers['Authorization'] = 'Bearer ' + TOKEN;
+  const res  = await fetch(path, { method: opts.method || 'GET', headers,
+    body: opts.body ? JSON.stringify(opts.body) : undefined });
+  const data = await res.json().catch(() => ({}));
+  return { ok: res.ok, status: res.status, data };
+}
+
+/* ── Boot ───────────────────────────────────────────────────── */
+async function boot() {
+  // show skeletons while loading
+  $('main').innerHTML = `
+    <div class="shop-header" style="margin-bottom:24px">
+      <div class="skeleton" style="width:160px;height:22px"></div>
+    </div>
+    <div class="products">${Array(6).fill(0).map(() => `
+      <div class="product-card visible" style="opacity:1;min-height:200px">
+        <div class="skeleton" style="width:48px;height:48px;border-radius:8px;margin-bottom:8px"></div>
+        <div class="skeleton" style="width:80%;height:14px;margin-bottom:6px"></div>
+        <div class="skeleton" style="width:50%;height:18px"></div>
+      </div>`).join('')}
+    </div>`;
+
+  const r = await api('/api/products');
+  if (r.ok) PRODUCTS = r.data;
+  if (TOKEN) {
+    const me = await api('/api/me');
+    if (me.ok) { ME = me.data; renderApp(); return; }
+    TOKEN = ''; localStorage.removeItem('token');
+  }
+  renderShopGuest();
+}
+
+/* ── Staggered card reveal ──────────────────────────────────── */
+function staggerCards() {
+  document.querySelectorAll('.product-card').forEach((card, i) => {
+    card.style.animationDelay = `${i * 60}ms`;
+    requestAnimationFrame(() => card.classList.add('visible'));
+  });
+}
+
+/* ── Render: Auth ───────────────────────────────────────────── */
+function showAuth(tab = 'login') {
+  $('main').innerHTML = `
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="auth-tab ${tab==='login'?'active':''}" onclick="showAuth('login')">Đăng nhập</button>
+          <button class="auth-tab ${tab==='register'?'active':''}" onclick="showAuth('register')">Đăng ký</button>
+        </div>
+        <div class="form-group">
+          <label>Tên đăng nhập</label>
+          <input id="f-user" type="text" placeholder="vd: nguyen123" autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label>Mật khẩu</label>
+          <input id="f-pass" type="password" placeholder="••••••" autocomplete="${tab==='login'?'current':'new'}-password" />
+        </div>
+        <p class="form-err" id="auth-err"></p>
+        <button class="btn btn-primary" style="width:100%;padding:10px;margin-top:4px"
+                onclick="submitAuth('${tab}')">
+          ${tab === 'login' ? 'Đăng nhập' : 'Tạo tài khoản'}
+        </button>
+      </div>
+    </div>`;
+  $('f-pass').addEventListener('keydown', e => { if (e.key === 'Enter') submitAuth(tab); });
+}
+
+async function submitAuth(type) {
+  const username = $('f-user').value.trim();
+  const password = $('f-pass').value;
+  if (!username || !password) { $('auth-err').textContent = 'Điền đầy đủ thông tin'; return; }
+  const btn = document.querySelector('.auth-card .btn-primary');
+  if (btn) { btn.textContent = '…'; btn.disabled = true; }
+  const r = await api('/api/' + type, { method: 'POST', body: { username, password } });
+  if (!r.ok) {
+    if (btn) { btn.textContent = type === 'login' ? 'Đăng nhập' : 'Tạo tài khoản'; btn.disabled = false; }
+    $('auth-err').textContent = r.data.error || 'Lỗi không xác định'; return;
+  }
+  TOKEN = r.data.token;
+  localStorage.setItem('token', TOKEN);
+  const me = await api('/api/me');
+  if (me.ok) { ME = me.data; renderApp(); }
+}
+
+/* ── Render: Header ─────────────────────────────────────────── */
+function renderHeader() {
+  $('header-right').innerHTML = ME ? `
+    <span style="font-size:.82rem;color:var(--text-dim)">
+      Xin chào, <strong style="color:var(--text)">${ME.username}</strong>
+    </span>
+    <button class="btn btn-ghost btn-sm" onclick="openTopupModal()">+ Nạp tiền</button>
+    <button class="btn btn-ghost btn-sm" onclick="logout()">Đăng xuất</button>` : `
+    <button class="btn btn-ghost btn-sm" onclick="showAuth('login')">Đăng nhập</button>
+    <button class="btn btn-primary btn-sm" onclick="showAuth('register')">Đăng ký</button>`;
+}
+
+/* ── Render: Shop (logged in) ───────────────────────────────── */
+function renderApp() {
+  renderHeader();
+  const html = `
+    <div class="shop-header">
+      <h1>Danh mục sản phẩm</h1>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="balance-pill">Số dư: <strong class="balance-animate">${fmt(ME.balance)}</strong></div>
+        <button class="btn btn-primary btn-sm" onclick="openTopupModal()">+ Nạp tiền</button>
+      </div>
+    </div>
+    <div class="products">${PRODUCTS.map(renderProductCard).join('')}</div>
+    <div id="qr-slot"></div>
+    <div>
+      <div class="section-title">Lịch sử giao dịch</div>
+      <div class="history-list">${renderHistory()}</div>
+    </div>
+    <div>
+      <div class="section-title">Đơn hàng của tôi</div>
+      ${renderOrders()}
+    </div>`;
+  $('main').innerHTML = html;
+  staggerCards();
+}
+
+/* ── Render: Shop (guest) ───────────────────────────────────── */
+function renderShopGuest() {
+  renderHeader();
+  $('main').innerHTML = `
+    <div class="shop-header">
+      <h1>Danh mục sản phẩm</h1>
+    </div>
+    <div class="products">${PRODUCTS.map(renderProductCard).join('')}</div>`;
+  staggerCards();
+}
+
+function renderProductCard(p) {
+  const inStock   = p.stock;
+  const badgeHtml = p.pop
+    ? `<span class="card-badge badge-popular">Phổ biến</span>` : '';
+  const outBadge  = !inStock
+    ? `<span class="card-badge badge-out" style="${p.pop?'left:10px;right:auto':''}">Hết hàng</span>` : '';
+  const feats  = (p.feats || []).map(f => `<li>${f}</li>`).join('');
+  const buyBtn = ME
+    ? `<button class="btn btn-primary btn-sm" onclick="buyProduct(${p.id})"
+         ${!inStock ? 'disabled' : ''}>${inStock ? 'Mua ngay' : 'Hết hàng'}</button>`
+    : `<button class="btn btn-ghost btn-sm" onclick="showAuth('login')">Đăng nhập để mua</button>`;
+  // escape price for data attr
+  const priceStr = fmt(p.price).replace(/"/g, '&quot;');
+  return `
+    <div class="product-card${!inStock?' out-of-stock':''}">
+      ${badgeHtml}${outBadge}
+      <div class="card-ico">${p.ico}</div>
+      <div class="card-name">${p.name}</div>
+      <div class="card-price" data-price="${priceStr}">${fmt(p.price)}</div>
+      <ul class="card-feats">${feats}</ul>
+      <div class="card-footer">
+        ${buyBtn}
+        <span class="card-sold">Đã bán: ${p.sold}</span>
+      </div>
+    </div>`;
+}
+
+function renderHistory() {
+  const h = (ME.history || []).slice(0, 50);
+  if (!h.length) return '<p style="color:var(--text-muted);font-size:.85rem">Chưa có giao dịch nào.</p>';
+  return h.map((x, i) => `
+    <div class="history-item" style="animation-delay:${i*40}ms">
+      <span class="h-desc">${x.d}</span>
+      <span class="h-time">${fmtDate(x.t)}</span>
+      <span class="h-amt ${x.a > 0 ? 'pos' : 'neg'}">${x.a > 0 ? '+' : ''}${fmt(x.a)}</span>
+    </div>`).join('');
+}
+
+function renderOrders() {
+  const orders = (ME.orders || []).slice(0, 20);
+  if (!orders.length) return '<p style="color:var(--text-muted);font-size:.85rem">Chưa có đơn hàng nào.</p>';
+  return orders.map((o, i) => `
+    <div class="order-item" style="animation-delay:${i*40}ms">
+      <span class="order-id">${o.id}</span>
+      <span class="order-name">${o.name}</span>
+      <span class="order-time">${fmtDate(o.t)}</span>
+    </div>`).join('');
+}
+
+/* ── Buy ────────────────────────────────────────────────────── */
+async function buyProduct(productId) {
+  const p = PRODUCTS.find(x => x.id === productId);
+  if (!p) return;
+  if (ME.balance < p.price) { toast('Số dư không đủ — hãy nạp thêm tiền', 'err'); return; }
+  const r = await api('/api/buy', { method: 'POST', body: { productId } });
+  if (!r.ok) { toast(r.data.error || 'Lỗi mua hàng', 'err'); return; }
+
+  const key   = r.data.order.key;
+  const order = r.data.order;
+  const me    = await api('/api/me');
+  if (me.ok) ME = me.data;
+
+  const slot = $('qr-slot') || $('main');
+  const box  = document.createElement('div');
+  box.className = 'qr-section';
+  box.innerHTML = `
+    <div style="color:var(--green);font-size:1.1rem;font-weight:700;margin-bottom:8px">✅ Mua thành công!</div>
+    <div style="font-size:.9rem;color:var(--text-dim);margin-bottom:6px">${order.name}</div>
+    <div style="font-size:.8rem;color:var(--text-dim);margin-bottom:10px">Mã đơn: <span style="color:var(--purple-hi);font-family:var(--mono)">${order.id}</span></div>
+    <div style="font-size:.85rem;color:var(--text-dim);margin-bottom:6px">Key của bạn:</div>
+    <div class="key-box" id="bought-key-${order.id}">${key}</div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:10px"
+            onclick="copyKey('bought-key-${order.id}')">📋 Sao chép key</button>`;
+  if ($('qr-slot')) {
+    $('qr-slot').innerHTML = '';
+    $('qr-slot').appendChild(box);
+  } else {
+    $('main').prepend(box);
+  }
+  box.scrollIntoView({ behavior: 'smooth' });
+  renderApp();
+  toast('Mua hàng thành công!', 'ok');
+}
+
+function copyKey(id) {
+  const el = $(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(() => toast('Đã sao chép key!', 'ok'));
+}
+
+/* ── Modal nạp tiền ─────────────────────────────────────────── */
+function openTopupModal() {
+  _selectedPreset = 0;
+  $('custom-amount').value = '';
+  const grid = $('preset-grid');
+  grid.innerHTML = '';
+  PRESETS.forEach(amt => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn';
+    btn.dataset.amount = amt;
+    btn.textContent = fmt(amt);
+    btn.onclick = () => {
+      grid.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      _selectedPreset = amt;
+      $('custom-amount').value = '';
+    };
+    grid.appendChild(btn);
+  });
+  $('topup-modal').classList.add('open');
+}
+
+function closeTopupModal() { $('topup-modal').classList.remove('open'); }
+function onModalOverlayClick(e) { if (e.target === $('topup-modal')) closeTopupModal(); }
+function onCustomInput() {
+  _selectedPreset = 0;
+  $('preset-grid').querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+}
+
+async function confirmTopup() {
+  const customVal = parseInt($('custom-amount').value, 10);
+  const amount    = customVal > 0 ? customVal : _selectedPreset;
+  if (!amount || amount < 10000) { toast('Chọn hoặc nhập số tiền tối thiểu 10,000₫', 'err'); return; }
+  closeTopupModal();
+  const r = await api('/api/topup', { method: 'POST', body: { amount } });
+  if (!r.ok) { toast(r.data.error || 'Lỗi tạo đơn nạp', 'err'); return; }
+  _currentQrMemo = r.data.memo;
+  showQR(r.data);
+}
+
+/* ── QR + polling ───────────────────────────────────────────── */
+function showQR(data) {
+  stopPolling();
+  const slot = $('qr-slot') || $('main');
+  const html = `
+    <div class="qr-section" id="qr-box">
+      <div class="qr-amount">${fmt(data.amount)}</div>
+      <div style="font-size:.85rem;color:var(--text-dim);margin-bottom:4px">
+        ${data.bankId} — ${data.accountNo} — ${data.accountName}
+      </div>
+      <div style="font-size:.85rem;color:var(--text-dim)">
+        Nội dung CK: <span class="qr-memo">${data.memo}</span>
+      </div>
+      <img src="${data.qr}" alt="QR thanh toán" />
+      <div class="qr-status pending" id="qr-status">⏳ Đang chờ thanh toán…</div>
+      <button class="btn btn-green btn-sm" style="margin-top:12px"
+              onclick="startPolling('${data.memo}')">Tôi đã chuyển — Kiểm tra</button>
+      <button class="btn btn-ghost btn-sm" style="margin-top:8px"
+              onclick="cancelQR()">Huỷ</button>
+    </div>`;
+  if ($('qr-slot')) {
+    $('qr-slot').innerHTML = html;
+  } else {
+    const div = document.createElement('div');
+    div.id = 'qr-slot';
+    div.innerHTML = html;
+    $('main').prepend(div);
+  }
+  $('qr-box').scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelQR() { stopPolling(); const slot = $('qr-slot'); if (slot) slot.innerHTML = ''; }
+function stopPolling() { if (_pollIv) { clearInterval(_pollIv); _pollIv = null; } }
+
+function startPolling(memo) {
+  stopPolling();
+  let tries = 0;
+  const max = 24;
+  _pollIv = setInterval(async () => {
+    tries++;
+    try {
+      const r = await api(`/api/topup/status?memo=${memo}`);
+      if (!r.ok) return;
+      const d = r.data;
+      if (d.status === 'paid') {
+        stopPolling();
+        const st = $('qr-status');
+        if (st) { st.textContent = '✅ Thanh toán thành công!'; st.className = 'qr-status paid'; }
+        toast('Nạp tiền thành công! Số dư đã cập nhật.', 'ok');
+        const me = await api('/api/me');
+        if (me.ok) { ME = me.data; }
+        setTimeout(() => { cancelQR(); renderApp(); }, 1800);
+        return;
+      }
+    } catch (_) {}
+    if (tries >= max) {
+      stopPolling();
+      const st = $('qr-status');
+      if (st) { st.textContent = '⏱ Chưa nhận được trong 2 phút — số dư sẽ tự cập nhật nếu đã chuyển.'; }
+    }
+  }, 5000);
+}
+
+/* ── Logout ─────────────────────────────────────────────────── */
+async function logout() {
+  await api('/api/logout', { method: 'POST' });
+  TOKEN = ''; ME = null;
+  localStorage.removeItem('token');
+  stopPolling();
+  renderShopGuest();
+  renderHeader();
+  toast('Đã đăng xuất');
+}
+
+/* ── Keyboard ───────────────────────────────────────────────── */
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTopupModal(); });
+
+/* ── Go ─────────────────────────────────────────────────────── */
+boot();
+</script>
 </body>
 </html>
